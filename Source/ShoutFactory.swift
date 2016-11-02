@@ -136,7 +136,7 @@ open class ShoutView: UIView {
     titleLabel.text = announcement.title
     subtitleLabel.text = announcement.subtitle
     
-    self.backgroundColor = announcement.backgroundColor
+    backgroundView.backgroundColor = announcement.backgroundColor
     titleLabel.textColor = announcement.textColor
     subtitleLabel.textColor = announcement.textColor
 
