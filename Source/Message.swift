@@ -22,6 +22,9 @@ public struct Announcement {
   public var image: UIImage?
   public var duration: TimeInterval
   public var action: (() -> Void)?
+    
+  public var textColor: UIColor
+  public var backgroundColor: UIColor
 
   public init(title: String, subtitle: String? = nil, image: UIImage? = nil, duration: TimeInterval = 2, action: (() -> Void)? = nil) {
     self.title = title
@@ -29,6 +32,9 @@ public struct Announcement {
     self.image = image
     self.duration = duration
     self.action = action
+    
+    self.textColor = ColorList.Whistle.title
+    self.backgroundColor = ColorList.Whistle.background
   }
 }
 
