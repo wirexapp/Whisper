@@ -165,8 +165,38 @@ open class WhistleFactory: UIViewController {
   func orientationDidChange() {
     if whistleWindow.isKeyWindow {
       setupFrames()
-      hide()
+      //hide()
     }
+  }
+    
+  // MARK:
+  open func updateFrames() {
+    let labelWidth = UIScreen.main.bounds.width
+    let defaultHeight = titleLabelHeight
+        
+    if let text = titleLabel.text {
+        let neededDimensions =
+            NSString(string: text).boundingRect(
+                with: CGSize(width: labelWidth, height: CGFloat.infinity),
+                options: NSStringDrawingOptions.usesLineFragmentOrigin,
+                attributes: [NSFontAttributeName: titleLabel.font],
+                context: nil
+        )
+        
+        titleLabelHeight = CGFloat(neededDimensions.size.height)
+        titleLabel.numberOfLines = 0 // Allows unwrapping
+            
+        if titleLabelHeight < defaultHeight {
+            titleLabelHeight = defaultHeight
+        }
+    } else {
+        titleLabel.sizeToFit()
+    }
+        
+    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth, height: titleLabelHeight)
+    view.frame = whistleWindow.bounds
+    titleLabel.frame = view.bounds
+    whistleWindow.layoutIfNeeded()
   }
     
   // MARK: - Gesture methods
