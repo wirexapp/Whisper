@@ -164,7 +164,8 @@ open class WhistleFactory: UIViewController {
 
   func orientationDidChange() {
     if whistleWindow.isKeyWindow {
-      setupFrames()
+      updateFrames()
+      //setupFrames()
       //hide()
     }
   }
