@@ -147,18 +147,26 @@ open class ShoutView: UIView {
     setupFrames()
   }
 
-  open func shout(to controller: UIViewController) {
-    let width = UIScreen.main.bounds.width
-    controller.view.addSubview(self)
-
-    frame = CGRect(x: 0, y: 0, width: width, height: 0)
-    backgroundView.frame = CGRect(x: 0, y: 0, width: width, height: 0)
-
-    UIView.animate(withDuration: 0.35, animations: {
-      self.frame.size.height = Dimensions.height
-      self.backgroundView.frame.size.height = self.frame.height
-    })
-  }
+    
+    open func shout(to controller: UIViewController) {
+        let width = UIScreen.main.bounds.width
+        if let window = controller.view.window {
+            window.addSubview(self)
+        } else {
+            controller.view.addSubview(self)
+        }
+        
+        
+        frame = CGRect(x: 0, y: 0, width: width, height: 0)
+        backgroundView.frame = CGRect(x: 0, y: 0, width: width, height: 0)
+        
+        UIView.animate(withDuration: 0.35, animations: {
+            self.frame.size.height = Dimensions.height
+            self.backgroundView.frame.size.height = self.frame.height
+        })
+    }
+    
+  
 
   // MARK: - Setup
 
