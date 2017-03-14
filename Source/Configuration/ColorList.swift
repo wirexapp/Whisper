@@ -13,4 +13,11 @@ public struct ColorList {
     public static var background = UIColor.white
     public static var title = UIColor.black
   }
+
+  public struct Wink {
+    public static var background = UIColor.white
+    public static var dragIndicator = UIColor(red:0.90, green:0.90, blue:0.90, alpha:1)
+    public static var title = UIColor.black
+    public static var subtitle = UIColor.black
+  }
 }
