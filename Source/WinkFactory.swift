@@ -30,13 +30,6 @@ open class WinkView: UIView {
     return view
     }()
 
-  open fileprivate(set) lazy var gestureContainer: UIView = {
-    let view = UIView()
-    view.isUserInteractionEnabled = true
-
-    return view
-    }()
-
   open fileprivate(set) lazy var indicatorView: UIView = {
     let view = UIView()
     view.backgroundColor = ColorList.Wink.dragIndicator
@@ -60,6 +53,7 @@ open class WinkView: UIView {
         label.font = FontList.Wink.title
         label.textColor = ColorList.Wink.title
         label.numberOfLines = 2
+        label.textAlignment = .center
 
         return label
     }()
@@ -68,7 +62,8 @@ open class WinkView: UIView {
         let label = UILabel()
         label.font = FontList.Wink.subtitle
         label.textColor = ColorList.Wink.subtitle
-        label.numberOfLines = 2
+        label.numberOfLines = 0
+        label.textAlignment = .center
 
         return label
     }()
@@ -101,7 +96,7 @@ open class WinkView: UIView {
     super.init(frame: frame)
 
     addSubview(backgroundView)
-    [indicatorView, imageView, titleLabel, subtitleLabel, gestureContainer].forEach {
+    [indicatorView, imageView, titleLabel, subtitleLabel].forEach {
       backgroundView.addSubview($0) }
 
     clipsToBounds = false
@@ -112,9 +107,8 @@ open class WinkView: UIView {
     layer.shadowRadius = 0.5
 
     addGestureRecognizer(tapGestureRecognizer)
-    gestureContainer.addGestureRecognizer(panGestureRecognizer)
+    addGestureRecognizer(panGestureRecognizer)
 
-    NotificationCenter.default.addObserver(self, selector: #selector(WinkView.orientationDidChange), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
   }
 
   public required init?(coder aDecoder: NSCoder) {
@@ -122,7 +116,7 @@ open class WinkView: UIView {
   }
 
   deinit {
-    NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+
   }
 
   // MARK: - Configuration
@@ -158,21 +152,21 @@ open class WinkView: UIView {
     
     open func shout(to controller: UIViewController) {
         let width = UIScreen.main.bounds.width
+//        if let nvc = controller as? UINavigationController {
+//            nvc.topViewController?.view.addSubview(self)
+//        } else
         if let window = controller.view.window {
             window.addSubview(self)
         } else {
             controller.view.addSubview(self)
         }
         
-        
-        frame = CGRect(x: 0, y: 0, width: width, height: 0)
-        backgroundView.frame = CGRect(x: 0, y: 0, width: width, height: 0)
+        frame = CGRect(x: 0, y: -Dimensions.height, width: width, height: Dimensions.height)
+
+        self.layoutIfNeeded()
         
         UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 0.4, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
-
-            self.frame.size.height = Dimensions.height
-            self.backgroundView.frame.size.height = self.frame.height
-
+            self.frame.origin.y = 0
         } , completion: {_ in })
     }
 
@@ -180,6 +174,45 @@ open class WinkView: UIView {
   
 
   // MARK: - Setup
+
+    func setupBackgroundContraints() {
+        backgroundView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        backgroundView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        backgroundView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        backgroundView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+    }
+    func setupImageViewContraints() {
+        let topOffset: CGFloat = 5
+        let imageSize: CGFloat = imageView.image != nil ? Dimensions.imageSize : 0
+
+        imageView.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: Dimensions.imageOffset).isActive = true
+        imageView.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant:  (Dimensions.height - imageSize) / 2 + topOffset).isActive = true
+
+
+    }
+    func setupTitleContraints() {
+        let textOffsetX: CGFloat = imageView.image != nil ? Dimensions.textOffset : 18
+        let textOffsetY = imageView.image != nil ? imageView.frame.origin.x + 3 : textOffsetX + 5
+
+        titleLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: textOffsetY).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: textOffsetX).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -18).isActive = true
+    }
+
+    func setupSubtitleContraints() {
+        subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2.5).isActive = true
+        subtitleLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
+        subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).isActive = true
+    }
+
+    func setupIndicatorContraints() {
+        indicatorView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -5).isActive = true
+        indicatorView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        indicatorView.widthAnchor.constraint(equalToConstant: Dimensions.indicatorWidth).isActive = true
+        indicatorView.heightAnchor.constraint(equalToConstant: Dimensions.indicatorHeight).isActive = true
+    }
 
   public func setupFrames() {
     Dimensions.height = UIApplication.shared.isStatusBarHidden ? 55 : 65
@@ -189,37 +222,26 @@ open class WinkView: UIView {
     let textOffsetX: CGFloat = imageView.image != nil ? Dimensions.textOffset : 18
     let imageSize: CGFloat = imageView.image != nil ? Dimensions.imageSize : 0
 
-    [titleLabel, subtitleLabel].forEach {
-        $0.frame.size.width = totalWidth - imageSize - (Dimensions.imageOffset * 2)
-        $0.sizeToFit()
+
+    [indicatorView, titleLabel, backgroundView, subtitleLabel, imageView].forEach { (view) in
+        view.translatesAutoresizingMaskIntoConstraints = false
     }
+
+    setupBackgroundContraints()
+    setupImageViewContraints()
+    setupTitleContraints()
+    setupSubtitleContraints()
+    setupIndicatorContraints()
 
     Dimensions.height += subtitleLabel.frame.height
 
-    backgroundView.frame.size = CGSize(width: totalWidth, height: Dimensions.height)
-    gestureContainer.frame = backgroundView.frame
-    indicatorView.frame = CGRect(x: (totalWidth - Dimensions.indicatorWidth) / 2,
-      y: Dimensions.height - Dimensions.indicatorHeight - 5, width: Dimensions.indicatorWidth, height: Dimensions.indicatorHeight)
-
-    imageView.frame = CGRect(x: Dimensions.imageOffset, y: (Dimensions.height - imageSize) / 2 + offset,
-      width: imageSize, height: imageSize)
-
-    let textOffsetY = imageView.image != nil ? imageView.frame.origin.x + 3 : textOffsetX + 5
-
-    titleLabel.frame.origin = CGPoint(x: textOffsetX, y: textOffsetY)
-    subtitleLabel.frame.origin = CGPoint(x: textOffsetX, y: titleLabel.frame.maxY + 2.5)
-
-    if subtitleLabel.text?.isEmpty ?? true {
-      titleLabel.center.y = imageView.center.y - 2.5
-    }
   }
 
   // MARK: - Actions
 
   open func silent() {
     UIView.animate(withDuration: 0.35, animations: {
-      self.frame.size.height = 0
-      self.backgroundView.frame.size.height = self.frame.height
+      self.frame.origin.y = -self.frame.height
       }, completion: { finished in
         self.completion?()
         self.displayTimer.invalidate()
@@ -275,16 +297,10 @@ open class WinkView: UIView {
         }, completion: { _ in if translation.y < -5 { self.completion?(); self.removeFromSuperview() }})
     }
 
-    UIView.animate(withDuration: duration, animations: {
-      self.backgroundView.frame.size.height = self.frame.height
-      self.indicatorView.frame.origin.y = self.frame.height - Dimensions.indicatorHeight - 5
-    })
+//    UIView.animate(withDuration: duration, animations: {
+//      //self.backgroundView.frame.size.height = self.frame.height
+//      self.indicatorView.frame.origin.y = self.frame.height - Dimensions.indicatorHeight - 5
+//    })
   }
 
-
-  // MARK: - Handling screen orientation
-
-  func orientationDidChange() {
-    setupFrames()
-  }
 }
