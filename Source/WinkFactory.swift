@@ -150,10 +150,10 @@ open class WinkView: UIView {
         frame.origin.y = topOffset - height
         frame.size.height = height
 
-        let springWithDamping: CGFloat = (40 / height)
+        let springWithDamping: CGFloat = 0.5
         let initialSpringVelocity: CGFloat = 3 / CGFloat(height / 70)
         
-        UIView.animate(withDuration: TimeInterval(animationVelocity * height), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: initialSpringVelocity, options: .curveEaseInOut, animations: {
+        UIView.animate(withDuration: TimeInterval(animationVelocity * height), delay: 0, usingSpringWithDamping: springWithDamping, initialSpringVelocity: initialSpringVelocity, options: .curveEaseInOut, animations: {
             self.frame.origin.y = topOffset
             //self.layoutIfNeeded()
         } , completion: {_ in })
