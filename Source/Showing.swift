@@ -24,7 +24,7 @@ public func show(whistle murmur: Murmur, action: WhistleAction = .show(1.5)) {
     whistleFactory.whistler(murmur, action: action)
 }
 
-public func hideWishper(from navigationController: UINavigationController, after: TimeInterval = 0) {
+public func hideWhisper(from navigationController: UINavigationController, after: TimeInterval = 0) {
     whisperFactory.silentWhisper(navigationController, after: after)
 }
 
