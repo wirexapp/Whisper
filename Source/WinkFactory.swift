@@ -14,7 +14,7 @@ open class WinkView: UIView {
 
     let animationVelocity: CGFloat =  0.35 / 60
 
-    private weak var winkWindow: UIWindow?
+    private var winkWindow: UIWindow?
 
     public struct Dimensions {
         public static let imageSize: CGFloat = 48
@@ -168,13 +168,15 @@ open class WinkView: UIView {
 
     private func wink(in window: UIWindow) {
         let winkWindow = UIWindow()
+        winkWindow.backgroundColor = .clear
+        self.winkWindow = winkWindow
 
         winkWindow.addSubview(self)
         winkWindow.windowLevel = UIWindowLevelStatusBar
         winkWindow.frame = CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: Dimensions.height)
         winkWindow.makeKeyAndVisible()
 
-        self.winkWindow = winkWindow
+
 
         animateWink(width: winkWindow.bounds.width, topOffset: UIApplication.shared.statusBarFrame.maxY)
 
@@ -212,9 +214,8 @@ open class WinkView: UIView {
             self.completion?()
             self.displayTimer.invalidate()
             self.removeFromSuperview()
-            if let winkWindow = self.winkWindow, let window = UIApplication.shared.windows.filter({ $0 != winkWindow }).first {
-                window.makeKeyAndVisible()
-                winkWindow.windowLevel = UIWindowLevelNormal - 1
+            if let winkWindow = self.winkWindow {
+                winkWindow.isHidden = true
                 self.winkWindow = nil
             }
         })
