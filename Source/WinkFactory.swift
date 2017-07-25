@@ -14,14 +14,14 @@ open class WinkView: UIView {
 
     let animationVelocity: CGFloat =  0.35 / 60
 
+    private weak var winkWindow: UIWindow?
+
     public struct Dimensions {
         public static let imageSize: CGFloat = 48
         public static let imageOffset: CGFloat = 18
-        public static var height: CGFloat = UIApplication.shared.isStatusBarHidden ? 55 : 65
+        public static var height: CGFloat = 70
         public static var textOffset: CGFloat = 75
     }
-
-  
 
     open fileprivate(set) lazy var backgroundView: UIView = {
         let view = UIView()
@@ -99,36 +99,55 @@ open class WinkView: UIView {
 
   }
 
-  // MARK: - Configuration
+    // MARK: - Configuration
 
-  open func craft(_ announcement: Announcement, to: UIViewController, completion: (() -> ())?) {
+    open func wink(_ announcement: Announcement, over view: UIView, completion: (() -> ())?) {
 
-    panGestureActive = false
-    shouldSilent = false
-    configureView(announcement)
-    shout(to: to)
+        preSetup(announcement)
 
-    self.completion = completion
-  }
+        wink(over: view)
 
-  open func configureView(_ announcement: Announcement) {
-    self.announcement = announcement
-    titleLabel.text = announcement.title
-    subtitleLabel.text = announcement.subtitle
+        self.completion = completion
+    }
+
+    open func wink(_ announcement: Announcement, in window: UIWindow, completion: (() -> ())?) {
+
+        preSetup(announcement)
+
+        wink(in: window)
+
+        self.completion = completion
+    }
+
+    open func wink(_ announcement: Announcement, to viewController: UIViewController, completion: (() -> ())?) {
+        preSetup(announcement)
+        wink(to: viewController)
+        self.completion = completion
+    }
+
+    private func preSetup(_ announcement: Announcement) {
+        panGestureActive = false
+        shouldSilent = false
+        configureView(announcement)
+    }
+
+    private func configureView(_ announcement: Announcement) {
+        self.announcement = announcement
+        titleLabel.text = announcement.title
+        subtitleLabel.text = announcement.subtitle
+
+        backgroundView.backgroundColor = announcement.backgroundColor
+        titleLabel.textColor = announcement.textColor
+        subtitleLabel.textColor = announcement.textColor
+
+        displayTimer.invalidate()
+        displayTimer = Timer.scheduledTimer(timeInterval: announcement.duration,
+          target: self, selector: #selector(WinkView.displayTimerDidFire), userInfo: nil, repeats: false)
+
+    }
+
     
-    backgroundView.backgroundColor = announcement.backgroundColor
-    titleLabel.textColor = announcement.textColor
-    subtitleLabel.textColor = announcement.textColor
-
-    displayTimer.invalidate()
-    displayTimer = Timer.scheduledTimer(timeInterval: announcement.duration,
-      target: self, selector: #selector(WinkView.displayTimerDidFire), userInfo: nil, repeats: false)
-
-
-  }
-
-    
-    open func shout(to controller: UIViewController) {
+    private func wink(to controller: UIViewController) {
         let width = UIScreen.main.bounds.width
         var topOffset: CGFloat = 0
         if let nvc = controller as? UINavigationController, !nvc.isNavigationBarHidden {
@@ -143,39 +162,64 @@ open class WinkView: UIView {
             controller.view.addSubview(self)
         }
 
+        animateWink(width: width, topOffset: topOffset)
 
-        frame = CGRect(x: 0, y: topOffset - 70, width: width, height: 70)
+    }
+
+    private func wink(in window: UIWindow) {
+        let winkWindow = UIWindow()
+
+        winkWindow.addSubview(self)
+        winkWindow.windowLevel = UIWindowLevelStatusBar
+        winkWindow.frame = CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: Dimensions.height)
+        winkWindow.makeKeyAndVisible()
+
+        self.winkWindow = winkWindow
+
+        animateWink(width: winkWindow.bounds.width, topOffset: UIApplication.shared.statusBarFrame.maxY)
+
+    }
+
+    private func wink(over view: UIView) {
+        view.addSubview(self)
+        animateWink(width: view.frame.width, topOffset: 0)
+    }
+
+    private func animateWink(width: CGFloat, topOffset: CGFloat) {
+        frame = CGRect(x: 0, y: topOffset - Dimensions.height, width: width, height: Dimensions.height)
         self.layoutIfNeeded()
         let height = self.backgroundView.frame.height
         frame.origin.y = topOffset - height
         frame.size.height = height
 
-        let springWithDamping: CGFloat = (40 / height)
+        let springWithDamping: CGFloat = 0.5
         let initialSpringVelocity: CGFloat = 3 / CGFloat(height / 70)
         
-        UIView.animate(withDuration: TimeInterval(animationVelocity * height), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: initialSpringVelocity, options: .curveEaseInOut, animations: {
+        UIView.animate(withDuration: TimeInterval(animationVelocity * height), delay: 0, usingSpringWithDamping: springWithDamping, initialSpringVelocity: initialSpringVelocity, options: .curveEaseInOut, animations: {
             self.frame.origin.y = topOffset
-            //self.layoutIfNeeded()
         } , completion: {_ in })
     }
 
   // MARK: - Actions
 
-  open func silent() {
+    open func unwink() {
 
-    let height = self.backgroundView.frame.height
+        let height = self.backgroundView.frame.height
 
-    UIView.animate(withDuration: TimeInterval(animationVelocity * height), animations: {
-        self.frame.origin.y -= height
-    }, completion: { finished in
-        self.completion?()
-        self.displayTimer.invalidate()
-        self.removeFromSuperview()
-    })
-  }
+        UIView.animate(withDuration: TimeInterval(animationVelocity * height), animations: {
+            self.frame.origin.y -= height
+        }, completion: { finished in
+            self.completion?()
+            self.displayTimer.invalidate()
+            self.removeFromSuperview()
+            if let winkWindow = self.winkWindow, let window = UIApplication.shared.windows.filter({ $0 != winkWindow }).first {
+                window.makeKeyAndVisible()
+                winkWindow.windowLevel = UIWindowLevelNormal - 1
+                self.winkWindow = nil
+            }
+        })
+    }
 
-    
-  
 
   // MARK: - Setup
 
@@ -202,34 +246,33 @@ open class WinkView: UIView {
         subtitleLabel.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -10).isActive = true
     }
 
-  public func setupFrames() {
+    public func setupFrames() {
 
-    [titleLabel, backgroundView, subtitleLabel].forEach { (view) in
-        view.translatesAutoresizingMaskIntoConstraints = false
+        [titleLabel, backgroundView, subtitleLabel].forEach { (view) in
+            view.translatesAutoresizingMaskIntoConstraints = false
+        }
+
+        setupBackgroundContraints()
+        setupTitleContraints()
+        setupSubtitleContraints()
+
     }
-
-    setupBackgroundContraints()
-    setupTitleContraints()
-    setupSubtitleContraints()
-
-  }
 
 
   // MARK: - Timer methods
 
-  open func displayTimerDidFire() {
-    shouldSilent = true
+    open func displayTimerDidFire() {
+        shouldSilent = true
+        if panGestureActive { return }
+        unwink()
+    }
 
-    if panGestureActive { return }
-    silent()
-  }
+    // MARK: - Gesture methods
 
-  // MARK: - Gesture methods
-
-  @objc fileprivate func handleTapGestureRecognizer() {
-    guard let announcement = announcement else { return }
-    announcement.action?()
-    silent()
-  }
+    @objc fileprivate func handleTapGestureRecognizer() {
+        guard let announcement = announcement else { return }
+        announcement.action?()
+        unwink()
+    }
 
 }
