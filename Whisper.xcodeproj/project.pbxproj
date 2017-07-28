@@ -14,6 +14,7 @@
 		290531131C20517E00FB382C /* WhisperFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2905310B1C20517E00FB382C /* WhisperFactory.swift */; };
 		290531141C20517E00FB382C /* WhisperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2905310C1C20517E00FB382C /* WhisperView.swift */; };
 		290531151C20517E00FB382C /* WhistleFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2905310D1C20517E00FB382C /* WhistleFactory.swift */; };
+		47974F761F2751A9008C601F /* WinkFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47974F751F2751A9008C601F /* WinkFactory.swift */; };
 		D2D71BB81D54B62B006AB907 /* Showing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D71BB71D54B62B006AB907 /* Showing.swift */; };
 		D5170D641C4955F3006F2F37 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5170D631C4955F3006F2F37 /* Config.swift */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,7 @@
 		2905310C1C20517E00FB382C /* WhisperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WhisperView.swift; sourceTree = "<group>"; };
 		2905310D1C20517E00FB382C /* WhistleFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WhistleFactory.swift; sourceTree = "<group>"; };
 		290531171C2051F400FB382C /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		47974F751F2751A9008C601F /* WinkFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WinkFactory.swift; sourceTree = "<group>"; };
 		D2D71BB71D54B62B006AB907 /* Showing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Showing.swift; sourceTree = "<group>"; };
 		D5170D631C4955F3006F2F37 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,6 +72,7 @@
 				2905310B1C20517E00FB382C /* WhisperFactory.swift */,
 				2905310C1C20517E00FB382C /* WhisperView.swift */,
 				2905310D1C20517E00FB382C /* WhistleFactory.swift */,
+				47974F751F2751A9008C601F /* WinkFactory.swift */,
 				D5170D631C4955F3006F2F37 /* Config.swift */,
 			);
 			path = Source;
@@ -176,6 +179,7 @@
 				290531151C20517E00FB382C /* WhistleFactory.swift in Sources */,
 				290531111C20517E00FB382C /* Message.swift in Sources */,
 				290531131C20517E00FB382C /* WhisperFactory.swift in Sources */,
+				47974F761F2751A9008C601F /* WinkFactory.swift in Sources */,
 				D5170D641C4955F3006F2F37 /* Config.swift in Sources */,
 				290531101C20517E00FB382C /* FontList.swift in Sources */,
 				2905310F1C20517E00FB382C /* ColorList.swift in Sources */,
@@ -290,7 +294,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = SupportFiles/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = no.hyper.Whisper;
 				PRODUCT_NAME = Whisper;
@@ -309,7 +313,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = SupportFiles/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = no.hyper.Whisper;
 				PRODUCT_NAME = Whisper;

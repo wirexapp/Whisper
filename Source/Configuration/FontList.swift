@@ -11,8 +11,8 @@ public struct FontList {
     public static var title = UIFont.systemFont(ofSize: 12)
   }
 
-    public struct Wink {
-        public static var title = UIFont.boldSystemFont(ofSize: 15)
-        public static var subtitle = UIFont.systemFont(ofSize: 13)
-    }
+  public struct Wink {
+    public static var title = UIFont.boldSystemFont(ofSize: 15)
+    public static var subtitle = UIFont.systemFont(ofSize: 13)
+  }
 }
