@@ -174,7 +174,7 @@ open class WinkView: UIView {
         winkWindow.addSubview(self)
         winkWindow.windowLevel = UIWindowLevelStatusBar
         winkWindow.frame = CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: Dimensions.height)
-        winkWindow.makeKeyAndVisible()
+        winkWindow.isHidden = false
 
 
 
