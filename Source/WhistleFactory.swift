@@ -83,9 +83,7 @@ open class WhistleFactory: UIViewController {
   }
 
   func moveWindowToFront() {
-    let currentStatusBarStyle = UIApplication.shared.statusBarStyle
     whistleWindow.windowLevel = UIWindowLevelStatusBar
-    UIApplication.shared.setStatusBarStyle(currentStatusBarStyle, animated: false)
   }
 
   open func setupFrames() {
@@ -132,7 +130,7 @@ open class WhistleFactory: UIViewController {
 
     let initialOrigin = whistleWindow.frame.origin.y
     whistleWindow.frame.origin.y = initialOrigin - titleLabelHeight
-    whistleWindow.makeKeyAndVisible()
+    whistleWindow.isHidden = false
     UIView.animate(withDuration: 0.2, animations: {
       self.whistleWindow.frame.origin.y = initialOrigin
     })
@@ -144,8 +142,7 @@ open class WhistleFactory: UIViewController {
       self.whistleWindow.frame.origin.y = finalOrigin
       }, completion: { _ in
         if let window = UIApplication.shared.windows.filter({ $0 != self.whistleWindow }).first {
-          window.makeKeyAndVisible()
-          self.whistleWindow.windowLevel = UIWindowLevelNormal - 1
+          self.whistleWindow.isHidden = true
           window.rootViewController?.setNeedsStatusBarAppearanceUpdate()
         }
     })
@@ -163,7 +160,7 @@ open class WhistleFactory: UIViewController {
   }
 
   func orientationDidChange() {
-    if whistleWindow.isKeyWindow {
+    if !whistleWindow.isHidden {
       updateFrames()
       //setupFrames()
       //hide()
