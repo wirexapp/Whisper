@@ -63,6 +63,7 @@ open class WhistleFactory: UIViewController {
     view.backgroundColor = murmur.backgroundColor
     whistleWindow.backgroundColor = murmur.backgroundColor
 
+    guard whistleWindow.isHidden else {return}
     moveWindowToFront()
     setupFrames()
 
@@ -112,8 +113,7 @@ open class WhistleFactory: UIViewController {
       titleLabel.sizeToFit()
     }
 
-    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth,
-      height: titleLabelHeight)
+    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth, height: titleLabelHeight)
     view.frame = whistleWindow.bounds
     titleLabel.frame = view.bounds
   }
@@ -131,22 +131,22 @@ open class WhistleFactory: UIViewController {
     let initialOrigin = whistleWindow.frame.origin.y
     whistleWindow.frame.origin.y = initialOrigin - titleLabelHeight
     whistleWindow.isHidden = false
+    whistleWindow.alpha = 0
     UIView.animate(withDuration: 0.2, animations: {
       self.whistleWindow.frame.origin.y = initialOrigin
+      self.whistleWindow.alpha = 1
     })
   }
 
-  public func hide() {
-    let finalOrigin = view.frame.origin.y - titleLabelHeight
-    UIView.animate(withDuration: 0.2, animations: {
-      self.whistleWindow.frame.origin.y = finalOrigin
-      }, completion: { _ in
-        if let window = UIApplication.shared.windows.filter({ $0 != self.whistleWindow }).first {
-          self.whistleWindow.isHidden = true
-          window.rootViewController?.setNeedsStatusBarAppearanceUpdate()
-        }
-    })
-  }
+    public func hide() {
+        let finalOrigin = view.frame.origin.y - titleLabelHeight
+        UIView.animate(withDuration: 0.2, animations: {
+          self.whistleWindow.frame.origin.y = finalOrigin
+          self.whistleWindow.alpha = 0
+        }, completion: { _ in
+            self.whistleWindow.isHidden = true
+        })
+    }
 
   public func calm(after: TimeInterval) {
     hideTimer.invalidate()
