@@ -29,7 +29,11 @@ public func hideWhisper(from navigationController: UINavigationController, after
 }
 
 public func hideWhistle(after timeInterval: TimeInterval = 0) {
-    whistleFactory.calm(after: timeInterval)
+    if timeInterval == 0 {
+        whistleFactory.hide()
+    } else {
+        whistleFactory.calm(after: timeInterval)
+    }
 }
 
 public func hideShout() {
