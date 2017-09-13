@@ -63,7 +63,9 @@ open class WhistleFactory: UIViewController {
     view.backgroundColor = murmur.backgroundColor
     whistleWindow.backgroundColor = murmur.backgroundColor
 
-    guard whistleWindow.isHidden else {return}
+//    guard whistleWindow.isHidden else {return}
+    hideTimer.invalidate()
+    whistleWindow.layer.removeAllAnimations()
     moveWindowToFront()
     setupFrames()
 
@@ -126,8 +128,6 @@ open class WhistleFactory: UIViewController {
   }
 
   public func present() {
-    hideTimer.invalidate()
-
     let initialOrigin = whistleWindow.frame.origin.y
     whistleWindow.frame.origin.y = initialOrigin - titleLabelHeight
     whistleWindow.isHidden = false
@@ -143,8 +143,10 @@ open class WhistleFactory: UIViewController {
         UIView.animate(withDuration: 0.2, animations: {
           self.whistleWindow.frame.origin.y = finalOrigin
           self.whistleWindow.alpha = 0
-        }, completion: { _ in
-            self.whistleWindow.isHidden = true
+        }, completion: { (finished) in
+            if finished {
+                self.whistleWindow.isHidden = true
+            }
         })
     }
 
