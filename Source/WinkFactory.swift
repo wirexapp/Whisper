@@ -262,7 +262,7 @@ open class WinkView: UIView {
 
   // MARK: - Timer methods
 
-    open func displayTimerDidFire() {
+    @objc open func displayTimerDidFire() {
         shouldSilent = true
         if panGestureActive { return }
         unwink()
