@@ -157,7 +157,7 @@ open class WinkView: UIView {
             topOffset = navFrameInTopVC.maxY
         } else if let window = controller.view.window {
             window.addSubview(self)
-            topOffset = UIApplication.shared.isStatusBarHidden ? 0 : 20
+            topOffset = UIApplication.shared.isStatusBarHidden ? 0 : UIApplication.shared.statusBarFrame.height
         } else {
             controller.view.addSubview(self)
         }

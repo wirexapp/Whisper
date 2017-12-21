@@ -8,6 +8,10 @@ public enum WhistleAction {
 let whistleFactory = WhistleFactory()
 
 open class WhistleFactory: UIViewController {
+    
+  let topSpacerHeight = UIApplication.shared.statusBarFrame.height > 20.0 ? UIApplication.shared.statusBarFrame.height : 0.0 //iPhone X height > 20
+    
+  var whistleHeight:CGFloat  { return topSpacerHeight + titleLabelHeight}
 
   open lazy var whistleWindow: UIWindow = UIWindow()
 
@@ -115,9 +119,9 @@ open class WhistleFactory: UIViewController {
       titleLabel.sizeToFit()
     }
 
-    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth, height: titleLabelHeight)
+    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth, height: whistleHeight)
     view.frame = whistleWindow.bounds
-    titleLabel.frame = view.bounds
+    titleLabel.frame = CGRect(x: view.bounds.origin.x, y: topSpacerHeight,  width: view.bounds.width, height:titleLabelHeight)
   }
 
   // MARK: - Movement methods
@@ -129,7 +133,7 @@ open class WhistleFactory: UIViewController {
 
   public func present() {
     let initialOrigin = whistleWindow.frame.origin.y
-    whistleWindow.frame.origin.y = initialOrigin - titleLabelHeight
+    whistleWindow.frame.origin.y = initialOrigin - whistleWindow.bounds.height
     whistleWindow.isHidden = false
     whistleWindow.alpha = 0
     UIView.animate(withDuration: 0.2, animations: {
@@ -139,7 +143,7 @@ open class WhistleFactory: UIViewController {
   }
 
     public func hide() {
-        let finalOrigin = view.frame.origin.y - titleLabelHeight
+        let finalOrigin = view.frame.origin.y - whistleWindow.bounds.height
         UIView.animate(withDuration: 0.2, animations: {
           self.whistleWindow.frame.origin.y = finalOrigin
           self.whistleWindow.alpha = 0
@@ -157,11 +161,11 @@ open class WhistleFactory: UIViewController {
 
   // MARK: - Timer methods
 
-    @objc public func timerDidFire() {
+  @objc public func timerDidFire() {
     hide()
   }
 
-    @objc func orientationDidChange() {
+  @objc func orientationDidChange() {
     if !whistleWindow.isHidden {
       updateFrames()
       //setupFrames()
@@ -193,9 +197,9 @@ open class WhistleFactory: UIViewController {
         titleLabel.sizeToFit()
     }
         
-    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth, height: titleLabelHeight)
+    whistleWindow.frame = CGRect(x: 0, y: 0, width: labelWidth, height: whistleHeight)
     view.frame = whistleWindow.bounds
-    titleLabel.frame = view.bounds
+    titleLabel.frame = CGRect(x: view.bounds.origin.x, y: topSpacerHeight,  width: view.bounds.width, height:titleLabelHeight)
     whistleWindow.layoutIfNeeded()
   }
     

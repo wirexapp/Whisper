@@ -31,7 +31,7 @@ class TableViewController: UITableViewController {
     let message = Message(title: "This message will silent in 3 seconds.", backgroundColor: UIColor(red:0.89, green:0.09, blue:0.44, alpha:1))
 
     Whisper.show(whisper: message, to: navigationController, action: .present)
-    hide(whisperFrom: navigationController, after: 3)
+    hideWhisper(from: navigationController, after: 3)
   }
 
   // MARK: - TableView methods
