@@ -59,45 +59,45 @@ open class WinkView: UIView {
         gesture.addTarget(self, action: #selector(WinkView.handleTapGestureRecognizer))
 
         return gesture
-    }()
+        }()
 
-  open fileprivate(set) var announcement: Announcement?
-  open fileprivate(set) var displayTimer = Timer()
-  open fileprivate(set) var panGestureActive = false
-  open fileprivate(set) var shouldSilent = false
-  open fileprivate(set) var completion: (() -> ())?
+    open fileprivate(set) var announcement: Announcement?
+    open fileprivate(set) var displayTimer = Timer()
+    open fileprivate(set) var panGestureActive = false
+    open fileprivate(set) var shouldSilent = false
+    open fileprivate(set) var completion: (() -> ())?
+    
+    private var subtitleLabelOriginalHeight: CGFloat = 0
+    
+    // MARK: - Initializers
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addSubview(backgroundView)
+        [titleLabel, subtitleLabel].forEach {
+            backgroundView.addSubview($0) }
+        
+        clipsToBounds = true
+        isUserInteractionEnabled = true
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOffset = CGSize(width: 0, height: 0.5)
+        layer.shadowOpacity = 0.1
+        layer.shadowRadius = 0.5
+        
+        addGestureRecognizer(tapGestureRecognizer)
+        
+        setupFrames()
+        
+    }
 
-  private var subtitleLabelOriginalHeight: CGFloat = 0
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
-  // MARK: - Initializers
+    deinit {
 
-  public override init(frame: CGRect) {
-    super.init(frame: frame)
-
-    addSubview(backgroundView)
-    [titleLabel, subtitleLabel].forEach {
-      backgroundView.addSubview($0) }
-
-    clipsToBounds = true
-    isUserInteractionEnabled = true
-    layer.shadowColor = UIColor.black.cgColor
-    layer.shadowOffset = CGSize(width: 0, height: 0.5)
-    layer.shadowOpacity = 0.1
-    layer.shadowRadius = 0.5
-
-    addGestureRecognizer(tapGestureRecognizer)
-
-    setupFrames()
-
-  }
-
-  public required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  deinit {
-
-  }
+    }
 
     // MARK: - Configuration
 
@@ -142,19 +142,23 @@ open class WinkView: UIView {
 
         displayTimer.invalidate()
         displayTimer = Timer.scheduledTimer(timeInterval: announcement.duration,
-          target: self, selector: #selector(WinkView.displayTimerDidFire), userInfo: nil, repeats: false)
+                                            target: self, selector: #selector(WinkView.displayTimerDidFire), userInfo: nil, repeats: false)
 
     }
 
-    
     private func wink(to controller: UIViewController) {
         let width = UIScreen.main.bounds.width
         var topOffset: CGFloat = 0
-        if let nvc = controller as? UINavigationController, !nvc.isNavigationBarHidden {
+        if let nvc = controller as? UINavigationController, !nvc.isNavigationBarHidden, let topViewController = nvc.topViewController  {
             let navFrame = nvc.navigationBar.frame
-            let navFrameInTopVC = nvc.navigationBar.superview!.convert(navFrame, to: nvc.topViewController!.view)
-            nvc.topViewController!.view.addSubview(self)
-            topOffset = navFrameInTopVC.maxY
+            if topViewController.view is UIScrollView {
+                nvc.navigationBar.superview?.insertSubview(self, belowSubview: nvc.navigationBar)
+                topOffset = navFrame.maxY
+            } else {
+                let navFrameInTopVC = nvc.navigationBar.superview!.convert(navFrame, to: topViewController.view)
+                topViewController.view.addSubview(self)
+                topOffset = navFrameInTopVC.maxY
+            }
         } else if let window = controller.view.window {
             window.addSubview(self)
             topOffset = UIApplication.shared.isStatusBarHidden ? 0 : UIApplication.shared.statusBarFrame.height
@@ -163,7 +167,6 @@ open class WinkView: UIView {
         }
 
         animateWink(width: width, topOffset: topOffset)
-
     }
 
     private func wink(in window: UIWindow) {
@@ -175,8 +178,6 @@ open class WinkView: UIView {
         winkWindow.windowLevel = UIWindowLevelStatusBar
         winkWindow.frame = CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: Dimensions.height)
         winkWindow.isHidden = false
-
-
 
         animateWink(width: winkWindow.bounds.width, topOffset: UIApplication.shared.statusBarFrame.maxY)
 
@@ -202,10 +203,8 @@ open class WinkView: UIView {
         } , completion: {_ in })
     }
 
-  // MARK: - Actions
-
+    // MARK: - Actions
     open func unwink() {
-
         let height = self.backgroundView.frame.height
 
         UIView.animate(withDuration: TimeInterval(animationVelocity * height), animations: {
@@ -221,9 +220,7 @@ open class WinkView: UIView {
         })
     }
 
-
-  // MARK: - Setup
-
+    // MARK: - Setup
     func setupBackgroundContraints() {
         topConstraint = backgroundView.topAnchor.constraint(equalTo: self.topAnchor)
         topConstraint?.isActive = true
@@ -259,9 +256,7 @@ open class WinkView: UIView {
 
     }
 
-
-  // MARK: - Timer methods
-
+    // MARK: - Timer methods
     @objc open func displayTimerDidFire() {
         shouldSilent = true
         if panGestureActive { return }
@@ -269,7 +264,6 @@ open class WinkView: UIView {
     }
 
     // MARK: - Gesture methods
-
     @objc fileprivate func handleTapGestureRecognizer() {
         guard let announcement = announcement else { return }
         announcement.action?()
